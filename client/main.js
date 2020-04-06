@@ -41,6 +41,8 @@ $(document).ready(function () {
     $("#btnLogout").click(function () {
         $("#btnLogin").css('display', 'inline-block');
         $("#btnLogout").css('display', 'none');
+        $("#dataFood").css('display', 'none');
+        $("#btnAddFood").css('display', 'none');
         localStorage.clear()
     });
 
@@ -64,53 +66,56 @@ $(document).ready(function () {
         })
             .done(function (result) {
                 $("#formFood").toggle();
+                getData(localStorage.getItem('access_token'))
             })
             .fail(function (err) {
                 console.log(err)
             })
     });
+});
 
-    function getData(token) {
-        $.ajax({
-            url: "http://localhost:3000/foods",
-            type: "GET",
-            headers: {
-                "access_token": localStorage.getItem('access_token')
+function deleteFood(id) {
+    console.log('a')
+    $.ajax({
+        url: "http://localhost:3000/foods/" + id,
+        type: "DELETE",
+        headers: {
+            "access_token": localStorage.getItem('access_token')
+        }
+    })
+        .done(function (result) {
+            getData(localStorage.getItem('access_token'))
+        })
+        .fail(function (err) {
+            console.log(err)
+        })
+}
+
+function getData(token) {
+    $.ajax({
+        url: "http://localhost:3000/foods",
+        type: "GET",
+        headers: {
+            "access_token": localStorage.getItem('access_token')
+        }
+    })
+        .done(function (result) {
+            console.log(result)
+            $("#tbody").html("")
+            for (let i = 0; i < result.data.length; i++) {
+                console.log(result.data[i])
+                $("#tbody").append(
+                    `<tr>
+                    <td> ${result.data[i].title} </td>
+                    <td> ${result.data[i].price} </td>
+                    <td> ${result.data[i].ingredients} </td>
+                    <td> ${result.data[i].tag} </td>
+                    <td> <button type="button" class="btn btn-primary" id="btnDelete" onclick="deleteFood(${result.data[i].id})">Delete</button> </td>
+
+                    </tr>`)
             }
         })
-            .done(function (result) {
-                console.log(result)
-                for (let i = 0; i < result.data.length; i++) {
-                    console.log(result.data[i])
-                    $("#tbody").append(
-                        `<tr>
-                        <td> ${result.data[i].title} </td>
-                        <td> ${result.data[i].price} </td>
-                        <td> ${result.data[i].ingredients} </td>
-                        <td> ${result.data[i].tag} </td>
-                        <td> <button onclick="myFunction()">Click me</button> </td>
-                        </tr>`)
-                }
-            })
-            .fail(function (err) {
-                console.log(err)
-            })
-    }
-
-    function myFunction() {
-        console.log('a')
-        //     $.ajax({
-        //         url: "http://localhost:3000/foods/" + id,
-        //         type: "DELETE",
-        //         headers: {
-        //             "access_token": localStorage.getItem('access_token')
-        //         }
-        //     })
-        //         .done(function (result) {
-        //             console.log(result)
-        //         })
-        //         .fail(function (err) {
-        //             console.log(err)
-        //         })
-    }
-});
+        .fail(function (err) {
+            console.log(err)
+        })
+}

@@ -22,7 +22,7 @@ class Users {
         })
             .then(data => {
                 //jangan lupa checkpassword & generate token
-                if (req.body.password == data.password) { // jangan lupa bcrypt
+                if (req.body.password == data.password) {
                     let access_token = jwt.sign({
                         userId: data.id,
                         email: data.email
